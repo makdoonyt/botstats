@@ -5,10 +5,10 @@ from telebot import types
 API_TOKEN = '785391201:AAFl25TBU_9CbtCQHiXgT2ZdkPoIkP5yVRI'
 
 bot = telebot.TeleBot(API_TOKEN)
-async = TeleBot.AsyncTeleBot(API_TOKEN)
+
+rank_updating = False
 
 user_dict = {}
-
 
 class User:
     def __init__(self, name):
@@ -30,9 +30,9 @@ def fntstats(message):
     else:
         keyboard = types.InlineKeyboardMarkup()
         keyboard.row(
-            types.InlineKeyboardButton('PC', callback_data='stats-PC/' + shur[1]),
-            types.InlineKeyboardButton('PSN', callback_data='stats-PSN/' + shur[1]),
-            types.InlineKeyboardButton('XBOX', callback_data='stats-XBOX/' + shur[1])
+            types.InlineKeyboardButton('PC', callback_data='stats-PC-' + shur[1]),
+            types.InlineKeyboardButton('PSN', callback_data='stats-PSN-' + shur[1]),
+            types.InlineKeyboardButton('XBOX', callback_data='stats-XBOX-' + shur[1])
         )
         bot.send_message(message.chat.id,'Bien @' + message.from_user.username + ', ahora elige la plataforma:', reply_markup=keyboard)
 
@@ -90,8 +90,8 @@ def send_rank(message, callback):
         img.close()
 
 def send_stats(message, callback):
-    plataforma = callback.split('/')[0]
-    shur = callback.split('/')[1]
+    plataforma = callback.split('-')[1]
+    shur = callback.split('-')[2]
     url = 'http://mclv.es/fortnite/' + plataforma + '/' + shur
     response = urllib.request.urlopen(url)
     if(response.info().get_content_type() == "text/html"):
@@ -107,11 +107,18 @@ def send_stats(message, callback):
         bot.send_photo(message.chat.id, img)
         img.close()
 
-@async.message_handler(commands=['fntupdate'])
+@bot.message_handler(commands=['fntupdate'])
 def send_welcome(message):
-    url = 'http://mclv.es/fortnite/update'
-    response = urllib.request.urlopen(url)
-    if(response.read() == "OK"):
+    global rank_updating
+
+    if(rank_updating):
+        bot.send_message(message.chat.id,'Ya hay una actualización del ranking en curso. No seas impaciente.')
+    else:
+        rank_updating = True
+        bot.send_message(message.chat.id,'Actualizando ranking... Esto puede llevar unos minutos.')
+        url = 'http://mclv.es/fortnite/update'
+        response = urllib.request.urlopen(url).read()
         bot.send_message(message.chat.id,'Ranking actualizado correctamente.')
+        rank_updating = False
 
 bot.polling()
