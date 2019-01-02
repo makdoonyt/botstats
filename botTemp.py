@@ -75,7 +75,7 @@ def send_rank(message, callback):
     window = callback.split('-')[1]
     category = callback.split('-')[2]
     url = 'http://mclv.es/fortnite/rank/' + window + '/' + category
-    response = urllib.urlopen(url)
+    response = urllib.request.urlopen(url)
     if(response.info().get_content_type() == "text/html"):
         bot.delete_message(message.chat.id, message.message_id)
         bot.send_message(message.chat.id,'Se ha producido un error al buscar el ranking.')
@@ -93,7 +93,7 @@ def send_stats(message, callback):
     plataforma = callback.split('-')[1]
     shur = callback.split('-')[2]
     url = 'http://mclv.es/fortnite/' + plataforma + '/' + shur
-    response = urllib.urlopen(url)
+    response = urllib.request.urlopen(url)
     if(response.info().get_content_type() == "text/html"):
         bot.delete_message(message.chat.id, message.message_id)
         bot.send_message(message.chat.id,'No encuentro el usuario ' + shur + ' en la plataforma ' + plataforma +'. Recuerda que solo funciona con la cuenta de Epic Games.')
@@ -117,7 +117,7 @@ def send_welcome(message):
         rank_updating = True
         bot.send_message(message.chat.id,'Actualizando ranking... Esto puede llevar unos minutos.')
         url = 'http://mclv.es/fortnite/update'
-        response = urllib.urlopen(url).read()
+        response = urllib.request.urlopen(url).read()
         bot.send_message(message.chat.id,'Ranking actualizado correctamente.')
         rank_updating = False
 
