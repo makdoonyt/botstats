@@ -1,5 +1,4 @@
-import telebot
-import urllib
+import telebot, urllib, re, time
 from telebot import types
 
 API_TOKEN = '785391201:AAFl25TBU_9CbtCQHiXgT2ZdkPoIkP5yVRI'
@@ -18,7 +17,7 @@ class User:
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     msg = bot.reply_to(message, """\
-Bienvenido shur! los comandos para ver tus estadísticas son los siguientes: "/shurstats <nombre>" "/ranking" "/rankupdate"
+Bienvenido shur! el comando para ver tus estadísticas es "/shurstats""
 """)
 
 
@@ -26,54 +25,60 @@ Bienvenido shur! los comandos para ver tus estadísticas son los siguientes: "/s
 def fntstats(message):
     shur = message.text.split('/shurstats ')
     if(len(shur)==1):
-        bot.send_message(message.chat.id,'Necesito un Usuario de Epic. Vuelve a escribir con /shurstats <usuario>')
+        bot.send_message(message.chat.id,'Necesito un Usuario de Epic. Vuelve a escribir con /shurstats Usuario')
     else:
         keyboard = types.InlineKeyboardMarkup()
         keyboard.row(
-            types.InlineKeyboardButton('PC', callback_data='shurstats-PC-' + shur[1]),
-            types.InlineKeyboardButton('PSN', callback_data='shurstats-PSN-' + shur[1]),
-            types.InlineKeyboardButton('XBOX', callback_data='shurstats-XBOX-' + shur[1])
+            types.InlineKeyboardButton('PC', callback_data='stats-' + str(message.from_user.id) + '-pc-' + shur[1]),
+            types.InlineKeyboardButton('PSN', callback_data='stats-' + str(message.from_user.id) + '-psn-' + shur[1]),
+            types.InlineKeyboardButton('XBOX', callback_data='stats-' + str(message.from_user.id) + '-xbox-' + shur[1])
         )
-        bot.send_message(message.chat.id,'Bien @' + message.from_user.username + ', ahora elige la plataforma:', reply_markup=keyboard)
+        msg = bot.send_message(message.chat.id,'Bien @' + message.from_user.username + ', ahora elige la plataforma:', reply_markup=keyboard)
+        time.sleep(10)
+        bot.delete_message(msg.chat.id, msg.message_id)
 
 @bot.message_handler(commands=['ranking'])
 def fntstats(message):
     keyboard = types.InlineKeyboardMarkup()
     keyboard.row(
-        types.InlineKeyboardButton('Lifetime', callback_data='rank-lifetime'),
-        types.InlineKeyboardButton('Temporada', callback_data='rank-current')
+        types.InlineKeyboardButton('Lifetime', callback_data='rank-' + str(message.from_user.id) + '-lifetime'),
+        types.InlineKeyboardButton('Temporada', callback_data='rank-' + str(message.from_user.id) + '-current')
     )
-    bot.send_message(message.chat.id,'Bien @' + message.from_user.username + ', ahora elige la plataforma:', reply_markup=keyboard)
+    msg = bot.send_message(message.chat.id,'Bien @' + message.from_user.username + ', ahora elige el periodo:', reply_markup=keyboard)
+    time.sleep(15)
+        bot.delete_message(msg.chat.id, msg.message_id)
 
 @bot.callback_query_handler(func=lambda call: True)
 def iq_callback(query):
     data = query.data
-    if data.startswith('shurstats-'):
+    parsed = re.compile('(stats|rank|rank2)-([0-9]+)-(pc|psn|xbox)-(.*)').findall(data)[0]
+    if (parsed[0] == "stats" and int(parsed[1]) == query.from_user.id):
         bot.answer_callback_query(query.id)
-        send_stats(query.message,data[4:])
-    if data.startswith('rank-'):
+        bot.delete_message(query.message.chat.id, query.message.message_id)
+        send_stats(query.message,parsed)
+    if (parsed[0] == "rank" and int(parsed[1]) == query.from_user.id):
         bot.answer_callback_query(query.id)
-        window = data[4:].split('-')[1]
+        window = parsed[2]
         keyboard = types.InlineKeyboardMarkup()
         keyboard.row(
-            types.InlineKeyboardButton('K/D', callback_data='rank2-' + window + '-kd'),
-            types.InlineKeyboardButton('Kills', callback_data='rank2-' + window + '-kills')
+            types.InlineKeyboardButton('K/D', callback_data='rank2-' + str(query.from_user.id) + '-' + window + '-kd'),
+            types.InlineKeyboardButton('Kills', callback_data='rank2-' + str(query.from_user.id) + '-' + window + '-kills')
         )
         keyboard.row(
-            types.InlineKeyboardButton('Winrate', callback_data='rank2-' + window + '-winrate'),
-            types.InlineKeyboardButton('Wins', callback_data='rank2-' + window + '-wins')
+            types.InlineKeyboardButton('Winrate', callback_data='rank2-' + str(query.from_user.id) + '-' + window + '-winrate'),
+            types.InlineKeyboardButton('Wins', callback_data='rank2-' + str(query.from_user.id) + '-' + window + '-wins')
         )
         keyboard.row(
-            types.InlineKeyboardButton('Matches', callback_data='rank2-' + window + '-matches')
+            types.InlineKeyboardButton('Matches', callback_data='rank2-' + str(query.from_user.id) + '-' + window + '-matches')
         )
         bot.edit_message_text('Ahora elige la categoría:', chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=keyboard)
-    if(data.startswith('rank2-')):
+    if(parsed[0] == "rank2" and int(parsed[1]) == query.from_user.id):
         bot.answer_callback_query(query.id)
-        send_rank(query.message,data[4:])
+        send_rank(query.message,parsed)
 
-def send_rank(message, callback):
-    window = callback.split('-')[1]
-    category = callback.split('-')[2]
+def send_rank(message, parsed):
+    window = parsed[2]
+    category = parsed[3]
     url = 'http://mclv.es/fortnite/rank/' + window + '/' + category
     response = urllib.request.urlopen(url)
     if(response.info().get_content_type() == "text/html"):
@@ -89,9 +94,9 @@ def send_rank(message, callback):
         bot.send_photo(message.chat.id, img)
         img.close()
 
-def send_stats(message, callback):
-    plataforma = callback.split('-')[1]
-    shur = callback.split('-')[2]
+def send_stats(message, parsed):
+    plataforma = parsed[2]
+    shur = parsed[3]
     url = 'http://mclv.es/fortnite/' + plataforma + '/' + shur
     response = urllib.request.urlopen(url)
     if(response.info().get_content_type() == "text/html"):
@@ -103,11 +108,10 @@ def send_stats(message, callback):
         f.write(response.read())
         f.close()
         img = open('image.jpg', 'rb')
-        bot.delete_message(message.chat.id, message.message_id)
         bot.send_photo(message.chat.id, img)
         img.close()
 
-@bot.message_handler(commands=['rankupdate'])
+@bot.message_handler(commands=['fntupdate'])
 def send_welcome(message):
     global rank_updating
 
@@ -122,3 +126,5 @@ def send_welcome(message):
         rank_updating = False
 
 bot.polling()
+while True: # Don't let the main Thread end.
+    pass
