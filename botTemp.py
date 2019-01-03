@@ -18,7 +18,7 @@ class User:
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     msg = bot.reply_to(message, """\
-Bienvenido shur! los comandos para ver tus estadísticas son los siguientes: "/statspc" "/statspsn" "/statsxbox"
+Bienvenido shur! los comandos para ver tus estadísticas son los siguientes: "/shurstats <nombre>" "/ranking" "/rankupdate"
 """)
 
 
@@ -26,7 +26,7 @@ Bienvenido shur! los comandos para ver tus estadísticas son los siguientes: "/s
 def fntstats(message):
     shur = message.text.split('/shurstats ')
     if(len(shur)==1):
-        bot.send_message(message.chat.id,'Necesito un Usuario de Epic. Vuelve a escribir con /shurstats Usuario')
+        bot.send_message(message.chat.id,'Necesito un Usuario de Epic. Vuelve a escribir con /shurstats <usuario>')
     else:
         keyboard = types.InlineKeyboardMarkup()
         keyboard.row(
@@ -50,10 +50,10 @@ def iq_callback(query):
     data = query.data
     if data.startswith('shurstats-'):
         bot.answer_callback_query(query.id)
-        send_stats(query.message,query.data[4:])
+        send_stats(query.message,data[4:])
     if data.startswith('rank-'):
         bot.answer_callback_query(query.id)
-        window = query.data[4:].split('-')[1]
+        window = data[4:].split('-')[1]
         keyboard = types.InlineKeyboardMarkup()
         keyboard.row(
             types.InlineKeyboardButton('K/D', callback_data='rank2-' + window + '-kd'),
@@ -69,7 +69,7 @@ def iq_callback(query):
         bot.edit_message_text('Ahora elige la categoría:', chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=keyboard)
     if(data.startswith('rank2-')):
         bot.answer_callback_query(query.id)
-        send_rank(query.message,query.data[4:])
+        send_rank(query.message,data[4:])
 
 def send_rank(message, callback):
     window = callback.split('-')[1]
@@ -107,7 +107,7 @@ def send_stats(message, callback):
         bot.send_photo(message.chat.id, img)
         img.close()
 
-@bot.message_handler(commands=['fntupdate'])
+@bot.message_handler(commands=['rankupdate'])
 def send_welcome(message):
     global rank_updating
 
