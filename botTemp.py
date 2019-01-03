@@ -22,17 +22,17 @@ Bienvenido shur! los comandos para ver tus estadísticas son los siguientes: "/s
 """)
 
 
-@bot.message_handler(commands=['stats'])
+@bot.message_handler(commands=['shurstats'])
 def fntstats(message):
-    shur = message.text.split('/stats ')
+    shur = message.text.split('/shurstats ')
     if(len(shur)==1):
         bot.send_message(message.chat.id,'Necesito un Usuario de Epic. Vuelve a escribir con /stats Usuario')
     else:
         keyboard = types.InlineKeyboardMarkup()
         keyboard.row(
-            types.InlineKeyboardButton('PC', callback_data='stats-PC-' + shur[1]),
-            types.InlineKeyboardButton('PSN', callback_data='stats-PSN-' + shur[1]),
-            types.InlineKeyboardButton('XBOX', callback_data='stats-XBOX-' + shur[1])
+            types.InlineKeyboardButton('PC', callback_data='shurstats-PC-' + shur[1]),
+            types.InlineKeyboardButton('PSN', callback_data='shurstats-PSN-' + shur[1]),
+            types.InlineKeyboardButton('XBOX', callback_data='shurstats-XBOX-' + shur[1])
         )
         bot.send_message(message.chat.id,'Bien @' + message.from_user.username + ', ahora elige la plataforma:', reply_markup=keyboard)
 
@@ -48,7 +48,7 @@ def fntstats(message):
 @bot.callback_query_handler(func=lambda call: True)
 def iq_callback(query):
     data = query.data
-    if data.startswith('stats-'):
+    if data.startswith('shurstats-'):
         bot.answer_callback_query(query.id)
         send_stats(query.message,query.data[4:])
     if data.startswith('rank-'):
