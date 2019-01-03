@@ -26,7 +26,7 @@ Bienvenido shur! los comandos para ver tus estadísticas son los siguientes: "/s
 def fntstats(message):
     shur = message.text.split('/shurstats ')
     if(len(shur)==1):
-        bot.send_message(message.chat.id,'Necesito un Usuario de Epic. Vuelve a escribir con /stats Usuario')
+        bot.send_message(message.chat.id,'Necesito un Usuario de Epic. Vuelve a escribir con /shurstats Usuario')
     else:
         keyboard = types.InlineKeyboardMarkup()
         keyboard.row(
