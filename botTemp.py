@@ -46,7 +46,7 @@ def fntstats(message):
     )
     msg = bot.send_message(message.chat.id,'Bien @' + message.from_user.username + ', ahora elige el periodo:', reply_markup=keyboard)
     time.sleep(15)
-        bot.delete_message(msg.chat.id, msg.message_id)
+    bot.delete_message(msg.chat.id, msg.message_id)
 
 @bot.callback_query_handler(func=lambda call: True)
 def iq_callback(query):
