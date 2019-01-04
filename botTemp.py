@@ -21,9 +21,9 @@ Bienvenido shur! el comando para ver tus estadísticas es "/shurstats""
 """)
 
 
-@bot.message_handler(commands=['shurstats'])
+@bot.message_handler(commands=['shurstats','SHURSTATS','Shurstats','ShurStats','sHURSTATS'])
 def fntstats(message):
-    shur = message.text.split('/shurstats ')
+    shur = re.split('/shurstats ', message.text, flags=re.IGNORECASE)
     if(len(shur)==1):
         bot.send_message(message.chat.id,'Necesito un Usuario de Epic. Vuelve a escribir con /shurstats Usuario')
     else:
@@ -35,9 +35,12 @@ def fntstats(message):
         )
         msg = bot.send_message(message.chat.id,'Bien @' + message.from_user.username + ', ahora elige la plataforma:', reply_markup=keyboard)
         time.sleep(10)
-        bot.delete_message(msg.chat.id, msg.message_id)
+        try:
+            bot.delete_message(msg.chat.id, msg.message_id)
+        except Exception as e:
+            print(e)
 
-@bot.message_handler(commands=['ranking'])
+@bot.message_handler(commands=['ranking','Ranking','RANKING','rANKING'])
 def fntstats(message):
     keyboard = types.InlineKeyboardMarkup()
     keyboard.row(
@@ -46,12 +49,15 @@ def fntstats(message):
     )
     msg = bot.send_message(message.chat.id,'Bien @' + message.from_user.username + ', ahora elige el periodo:', reply_markup=keyboard)
     time.sleep(15)
-    bot.delete_message(msg.chat.id, msg.message_id)
+    try:
+        bot.delete_message(msg.chat.id, msg.message_id)
+    except Exception as e:
+        print(e)
 
 @bot.callback_query_handler(func=lambda call: True)
 def iq_callback(query):
     data = query.data
-    parsed = re.compile('(stats|rank|rank2)-([0-9]+)-(pc|psn|xbox)-(.*)').findall(data)[0]
+    parsed = re.compile('(.*?)-([0-9]+)-(pc|psn|xbox)-(.*)').findall(data)[0]
     if (parsed[0] == "stats" and int(parsed[1]) == query.from_user.id):
         bot.answer_callback_query(query.id)
         bot.delete_message(query.message.chat.id, query.message.message_id)
@@ -74,6 +80,7 @@ def iq_callback(query):
         bot.edit_message_text('Ahora elige la categoría:', chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=keyboard)
     if(parsed[0] == "rank2" and int(parsed[1]) == query.from_user.id):
         bot.answer_callback_query(query.id)
+        bot.delete_message(query.message.chat.id, query.message.message_id)
         send_rank(query.message,parsed)
 
 def send_rank(message, parsed):
@@ -82,7 +89,6 @@ def send_rank(message, parsed):
     url = 'http://mclv.es/fortnite/rank/' + window + '/' + category
     response = urllib.request.urlopen(url)
     if(response.info().get_content_type() == "text/html"):
-        bot.delete_message(message.chat.id, message.message_id)
         bot.send_message(message.chat.id,'Se ha producido un error al buscar el ranking.')
     else:
         bot.send_chat_action(message.chat.id, 'upload_photo')
@@ -100,7 +106,6 @@ def send_stats(message, parsed):
     url = 'http://mclv.es/fortnite/' + plataforma + '/' + shur
     response = urllib.request.urlopen(url)
     if(response.info().get_content_type() == "text/html"):
-        bot.delete_message(message.chat.id, message.message_id)
         bot.send_message(message.chat.id,'No encuentro el usuario ' + shur + ' en la plataforma ' + plataforma +'. Recuerda que solo funciona con la cuenta de Epic Games.')
     else:
         bot.send_chat_action(message.chat.id, 'upload_photo')
@@ -112,7 +117,7 @@ def send_stats(message, parsed):
         img.close()
 
 @bot.message_handler(commands=['fntupdate'])
-def send_welcome(message):
+def update_rank(message):
     global rank_updating
 
     if(rank_updating):
@@ -125,6 +130,4 @@ def send_welcome(message):
         bot.send_message(message.chat.id,'Ranking actualizado correctamente.')
         rank_updating = False
 
-bot.polling()
-while True: # Don't let the main Thread end.
-    pass
+bot.polling(none_stop=True)
