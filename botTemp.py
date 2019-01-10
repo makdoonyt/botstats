@@ -174,12 +174,12 @@ def iq_callback(query):
             url = 'http://mclv.es/fortnite/rankedit/remove/' + parsed[3]
             response = urllib.request.urlopen(url).read()
             delete_message(query.message.chat.id, query.message.message_id)
-            bot.send_message(query.message.chat.id,response.result)
+            bot.send_message(query.message.chat.id, parsed[3] + response.decode("utf-8"))
     if(parsed[0] == "rankeditadd" and int(parsed[1]) == query.from_user.id):
         bot.answer_callback_query(query.id)
         url = 'http://mclv.es/fortnite/rankedit/add/' + parsed[3] + '/' + parsed[2]
         response = urllib.request.urlopen(url).read()
         delete_message(query.message.chat.id, query.message.message_id)
-        bot.send_message(query.message.chat.id,response.result)
+        bot.send_message(query.message.chat.id, parsed[3] + response.decode("utf-8"))
 
 bot.polling(none_stop=True, timeout=60)
