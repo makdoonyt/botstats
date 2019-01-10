@@ -115,7 +115,7 @@ def update_rank(message):
 @bot.message_handler(commands=['rankedit'])
 def rank_edit(message):
     global separator
-    if(message.chat.id == "-1001132498727" and bot.get_chat_member(message.chat.id,message.from_user.id).status in ["administrator","creator"]):
+    if(message.chat.id == -1001132498727 and bot.get_chat_member(message.chat.id,message.from_user.id).status in ["administrator","creator"]):
         shur = message.text[10:]
         if shur == "":
             bot.send_message(message.chat.id,'Necesito un Usuario de Epic. Vuelve a escribir con /rankedit Usuario')
