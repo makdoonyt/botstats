@@ -36,7 +36,7 @@ def fntstats(message):
     if shur == "":
         bot.send_message(message.chat.id,'Necesito un Usuario de Epic. Vuelve a escribir con /shurstats <usuario>')
         return
-    print(message.chat.id)
+    print(mssage.chat.id)
     # Botones de estadísticas. Elección de plataforma
     keyboard = types.InlineKeyboardMarkup()
     keyboard.row(
@@ -115,9 +115,7 @@ def update_rank(message):
 @bot.message_handler(commands=['rankedit'])
 def rank_edit(message):
     global separator
-
-    print(bot.get_chat_member(message.chat.id,message.from_user.id).status)
-    if (bot.get_chat_member(message.chat.id,message.from_user.id).status == "member"):
+    if(message.chat.id == "-1001132498727" and bot.get_chat_member(message.chat.id,message.from_user.id).status in ["administrator","creator"]):
         shur = message.text[10:]
         if shur == "":
             bot.send_message(message.chat.id,'Necesito un Usuario de Epic. Vuelve a escribir con /rankedit Usuario')
@@ -176,11 +174,12 @@ def iq_callback(query):
             url = 'http://mclv.es/fortnite/rankedit/remove/' + parsed[3]
             response = urllib.request.urlopen(url).read()
             delete_message(query.message.chat.id, query.message.message_id)
+            bot.send_message(query.message.chat.id,response.result)
     if(parsed[0] == "rankeditadd" and int(parsed[1]) == query.from_user.id):
         bot.answer_callback_query(query.id)
         url = 'http://mclv.es/fortnite/rankedit/add/' + parsed[3] + '/' + parsed[2]
         response = urllib.request.urlopen(url).read()
         delete_message(query.message.chat.id, query.message.message_id)
-
+        bot.send_message(query.message.chat.id,response.result)
 
 bot.polling(none_stop=True, timeout=60)
