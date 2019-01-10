@@ -36,7 +36,7 @@ def fntstats(message):
     if shur == "":
         bot.send_message(message.chat.id,'Necesito un Usuario de Epic. Vuelve a escribir con /shurstats <usuario>')
         return
-    print(mssage.chat.id)
+    print(message.chat.id)
     # Botones de estadísticas. Elección de plataforma
     keyboard = types.InlineKeyboardMarkup()
     keyboard.row(
