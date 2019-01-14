@@ -3,13 +3,13 @@ import telebot, urllib, re, time, datetime, tweepy, pathlib
 from telebot import types
 from pathlib import Path
 
-consumer_key = 'xZh7sPtTuRJddGGBX098iWPzo'
-consumer_secret = 'jfY5dscS7DVmr0OXv4h3PxfoWZw9WAXSH1onNbG3J7OLXWNwRH'
-access_token = '535830720-hVuDrLVlhcAZzHSNQrWduNbVv8SIHcakweYDE8L7'
-access_token_secret = 's5RQclMX2Z0qMB6eCRcQOD07NXJ66rWcbznh7EZs3B6OF'
+consumer_key = '**********'
+consumer_secret = '**********'
+access_token = '**********'
+access_token_secret = '**********'
 
 
-API_TOKEN = '653272381:AAELYn9Rb1gNdnLOoCoyOmS79PFdFZtNX50'
+API_TOKEN = '**********'
 
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
