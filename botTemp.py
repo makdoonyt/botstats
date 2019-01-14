@@ -1,14 +1,25 @@
 # -*- coding: utf-8 -*-
-import telebot, urllib, re, time
+import telebot, urllib, re, time, datetime, tweepy, pathlib
 from telebot import types
+from pathlib import Path
+
+consumer_key = 'xZh7sPtTuRJddGGBX098iWPzo'
+consumer_secret = 'jfY5dscS7DVmr0OXv4h3PxfoWZw9WAXSH1onNbG3J7OLXWNwRH'
+access_token = '535830720-hVuDrLVlhcAZzHSNQrWduNbVv8SIHcakweYDE8L7'
+access_token_secret = 's5RQclMX2Z0qMB6eCRcQOD07NXJ66rWcbznh7EZs3B6OF'
 
 
-API_TOKEN = '785391201:AAFl25TBU_9CbtCQHiXgT2ZdkPoIkP5yVRI'
+API_TOKEN = '653272381:AAELYn9Rb1gNdnLOoCoyOmS79PFdFZtNX50'
 
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
+
+tweet = tweepy.API(auth)
 bot = telebot.TeleBot(API_TOKEN)
 
 rank_updating = False
 separator = "ྖ"
+CURRENT_SEASON = "7"
 
 #Función para borrar mensajes sin error cuando no exista
 def delete_message(chat_id,msg_id):
@@ -27,6 +38,51 @@ class User:
 def send_welcome(message):
     msg = bot.reply_to(message, 'Bienvenido shur! el comando para ver tus estadísticas es "/shurstats <usuario>"')
 
+@bot.message_handler(regexp="/semana([2-9]|10?)")
+def semana(message):
+    global CURRENT_SEASON
+    regexp = re.compile("semana([2-9]|10?)")
+    week = regexp.findall(message.text)[0]
+    today = datetime.datetime.today()
+    latest = 0
+
+    challenge = Path("challenges/" + CURRENT_SEASON + "/" + week + ".jpg")
+    if not Path("challenges/" + CURRENT_SEASON).exists():
+        pathlib.Path("challenges/" + CURRENT_SEASON).mkdir(parents=True,exist_ok=False)
+    if challenge.is_file():
+        bot.send_chat_action(message.chat.id, 'upload_photo')
+        img = open(challenge, 'rb')
+        bot.send_photo(message.chat.id, img)
+        img.close()
+        return
+    else:
+        for status in tweepy.Cursor(tweet.user_timeline, id="thesquatingdog", tweet_mode="extended").items(1000):
+            #Tweets con mas de 80 días descartados
+            if abs((status.created_at - today).days) > 80:
+                bot.send_message(message.chat.id,"La semana " + week + " aún no está publicada.")
+                return
+            #Definir última semana publicada
+            if "CHEAT SHEET" in status.full_text and latest == 0:
+                latest = int(float(re.compile("WEEK ([2-9]|10?)").findall(status.full_text)[0]))
+            if latest > 0 and int(float(week)) > latest:
+                bot.send_message(message.chat.id,"La semana " + week + " aún no está publicada.")
+                return
+            if "CHEAT SHEET" in status.full_text and "WEEK " + week in status.full_text and "SEASON " + CURRENT_SEASON in status.full_text:
+                if len(status.extended_entities["media"]) > 1:
+                    url = status.extended_entities["media"][1]["media_url"]
+                else:
+                    url = status.extended_entities["media"][0]["media_url"]
+
+                response = urllib.request.urlopen(url)
+                bot.send_chat_action(message.chat.id, 'upload_photo')
+                f = open('challenges/' + CURRENT_SEASON + '/' + week + '.jpg','wb')
+                f.write(response.read())
+                f.close()
+                img = open('challenges/' + CURRENT_SEASON + '/' + week + '.jpg', 'rb')
+                bot.send_photo(message.chat.id, img)
+                img.close()
+                return
+        bot.send_message(message.chat.id,"La semana " + week + " aún no está publicada.")
 
 @bot.message_handler(commands=['shurstats','SHURSTATS','Shurstats','ShurStats','sHURSTATS'])
 def fntstats(message):
@@ -36,7 +92,7 @@ def fntstats(message):
     if shur == "":
         bot.send_message(message.chat.id,'Necesito un Usuario de Epic. Vuelve a escribir con /shurstats <usuario>')
         return
-    print(mssage.chat.id)
+
     # Botones de estadísticas. Elección de plataforma
     keyboard = types.InlineKeyboardMarkup()
     keyboard.row(
@@ -48,11 +104,13 @@ def fntstats(message):
     time.sleep(10)
     delete_message(msg.chat.id, msg.message_id)
 
-
 @bot.message_handler(commands=['ranking','Ranking','RANKING','rANKING'])
 def fntstats(message):
     global separator
-
+    if isinstance(message.from_user.username, str) is False:
+        bot.send_message(message.chat.id,'Ha ocurrido un error.')
+        print(message)
+        return
     # Botones de ranking. Elección del periodo
     keyboard = types.InlineKeyboardMarkup()
     keyboard.row(
@@ -95,7 +153,7 @@ def send_stats(message, plataforma, shur):
         bot.send_photo(message.chat.id, img)
         img.close()
 
-@bot.message_handler(commands=['fntupdate'])
+@bot.message_handler(commands=['fntupdate','rankupdate'])
 def update_rank(message):
     global rank_updating
 
@@ -115,12 +173,14 @@ def update_rank(message):
 @bot.message_handler(commands=['rankedit'])
 def rank_edit(message):
     global separator
-    if(message.chat.id == -1001132498727 and bot.get_chat_member(message.chat.id,message.from_user.id).status in ["administrator","creator"]):
+    if(message.chat.id in [-1001427150679,-1001132498727] and bot.get_chat_member(message.chat.id,message.from_user.id).status in ["administrator","creator"]):
         shur = message.text[10:]
         if shur == "":
             bot.send_message(message.chat.id,'Necesito un Usuario de Epic. Vuelve a escribir con /rankedit Usuario')
             return
-
+        if shur == None:
+            bot.send_message(message.chat.id,'Ha ocurrido un error.')
+            return
         # Botones de estadísticas. Elección de plataforma
         keyboard = types.InlineKeyboardMarkup()
         keyboard.row(
