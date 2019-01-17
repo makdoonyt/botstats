@@ -1,95 +1,97 @@
-import telebot
+# -*- coding: utf-8 -*-
+import urllib, time
 from telebot import types
 
-API_TOKEN = '653272381:AAELYn9Rb1gNdnLOoCoyOmS79PFdFZtNX50'
-
-bot = telebot.TeleBot(API_TOKEN)
-
-user_dict = {}
-
+from main import bot, separator, delete_message
+from islas import islas
+from semana import semana
+from shurstats import stats, send_stats
+from ranking import rank, rankUpdate, rankEdit, send_rank
 
 class User:
     def __init__(self, name):
         self.name = name
         self.sex = None
-# Handle '/start' and '/help'
-@bot.message_handler(commands=['start'])
+
+@bot.message_handler(commands=["start"])
 def send_welcome(message):
-    msg = bot.reply_to(message, """\
-Bienvenido shur! los comandos para ver tus estadísticas son los siguientes: "/statspc" "/statspsn" "/statsxbox"
-""")
+    msg = bot.reply_to(message, "Bienvenido shur! el comando para ver tus estadísticas es \"/shurstats <usuario>\"")
 
+@bot.message_handler(commands=['creativo','islas'])
+def imported_islas(message):
+    islas(message)
 
-# Handle '/start' and '/help'
-@bot.message_handler(commands=['statspc'])
-def send_welcome(message):
-    msg = bot.reply_to(message, """\
-Hola shur, dime tu nombre en el juego (si tiene espacios, debido a un problema de telegram deberás usar %20 como espacio, EJ: Not%20Tfue)
-""")
-    bot.register_next_step_handler(msg, process_pc_step)
+@bot.message_handler(regexp="/semana([2-9]|10?)")
+def imported_semana(message):
+    semana(message)
 
+@bot.message_handler(commands=["shurstats","SHURSTATS","Shurstats","ShurStats","sHURSTATS"])
+def imported_stats(message):
+    stats(message)
 
-def process_pc_step(message):
-    try:
-        chat_id = message.chat.id
-        name = message.text
-        user = User(name)
-        user_dict[chat_id] = user
-        msg = bot.reply_to(message, '')
-    except Exception as e:
-        bot.send_message(chat_id, 'http://mclv.es/fortnite/pc/' + user.name)
-    except Exception as e:
-        bot.reply_to(message, e)
+@bot.message_handler(commands=["ranking","Ranking","RANKING","rANKING"])
+def imported_ranking(message):
+    rank(message)
 
-@bot.message_handler(commands=['statspsn'])
-def send_welcome(message):
-    msg = bot.reply_to(message, """\
-Hola shur, dime tu nombre en el juego (si tiene espacios, debido a un problema de telegram deberás usar %20 como espacio, EJ: Not%20Tfue)
-""")
-    bot.register_next_step_handler(msg, process_psn_step)
+@bot.message_handler(commands=["fntupdate","rankupdate"])
+def imported_rankUpdate(message):
+    rankUpdate(message)
 
-def process_psn_step(message):
-    try:
-        chat_id = message.chat.id
-        name = message.text
-        user = User(name)
-        user_dict[chat_id] = user
-        msg = bot.reply_to(message, '')
-    except Exception as e:
-        bot.send_message(chat_id, 'http://mclv.es/fortnite/psn/' + user.name)
-    except Exception as e:
-        bot.reply_to(message, e)
+@bot.message_handler(commands=["rankedit"])
+def imported_rankEdit(message):
+    rankEdit(message)
 
-@bot.message_handler(commands=['statsxbox'])
-def send_welcome(message):
-    msg = bot.reply_to(message, """\
-Hola shur, dime tu nombre en el juego (si tiene espacios, debido a un problema de telegram deberás usar %20 como espacio, EJ: Not%20Tfue)
-""")
-    bot.register_next_step_handler(msg, process_xbox_step)
+@bot.callback_query_handler(func=lambda call: True)
+def iq_callback(query):
+    global separator
 
-def process_xbox_step(message):
-    try:
-        chat_id = message.chat.id
-        name = message.text
-        user = User(name)
-        user_dict[chat_id] = user
-        msg = bot.reply_to(message, '')
-    except Exception as e:
-        bot.send_message(chat_id, 'http://mclv.es/fortnite/xbox/' + user.name)
-    except Exception as e:
-        bot.reply_to(message, e)
-@bot.message_handler(commands=['update'])
-def send_welcome(message):
-    msg = bot.reply_to(message, """\
-Haz clic en este enlace para actualizar el ranking http://mclv.es/fortnite/update
-""")
-@bot.message_handler(commands=['rankingkd'])
-def send_welcome(message):
-    msg = bot.reply_to(message, """\
-http://mclv.es/fortnite/rank/lifetime/kd
-""")
+    parsed = query.data.split(separator)
+    # [0] Identificación de la petición
+    # [1] ID de usuario en Telegram. Para bloquar el botón
+    if (parsed[0] == "stats" and int(parsed[1]) == query.from_user.id):
+        bot.answer_callback_query(query.id)
+        bot.delete_message(query.message.chat.id, query.message.message_id)
+        send_stats(query.message, parsed[2], parsed[3])
+    if (parsed[0] == "rank" and int(parsed[1]) == query.from_user.id):
+        bot.answer_callback_query(query.id)
+        window = parsed[2]
+        keyboard = types.InlineKeyboardMarkup()
+        keyboard.row(
+            types.InlineKeyboardButton("K/D", callback_data=separator.join( ["rank2", str(query.from_user.id), window, "kd"] )),
+            types.InlineKeyboardButton("Kills", callback_data=separator.join( ["rank2", str(query.from_user.id), window, "kills"] ))
+        )
+        keyboard.row(
+            types.InlineKeyboardButton("Winrate", callback_data=separator.join( ["rank2", str(query.from_user.id), window, "winrate"] )),
+            types.InlineKeyboardButton("Wins", callback_data=separator.join( ["rank2", str(query.from_user.id), window, "wins"] ))
+        )
+        keyboard.row(
+            types.InlineKeyboardButton("Matches", callback_data=separator.join( ["rank2", str(query.from_user.id), window, "matches"] ))
+        )
+        bot.edit_message_text("Ahora elige la categoría:", chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=keyboard)
+    if(parsed[0] == "rank2" and int(parsed[1]) == query.from_user.id):
+        bot.answer_callback_query(query.id)
+        delete_message(query.message.chat.id, query.message.message_id)
+        send_rank(query.message, parsed[2], parsed[3])
+    if(parsed[0] == "rankedit" and int(parsed[1]) == query.from_user.id):
+        bot.answer_callback_query(query.id)
+        if(parsed[2] == "add"):
+            keyboard = types.InlineKeyboardMarkup()
+            keyboard.row(
+                types.InlineKeyboardButton( "PC", callback_data=separator.join( ["rankeditadd", str(query.from_user.id), "pc", parsed[3]] ) ),
+                types.InlineKeyboardButton( "PSN", callback_data=separator.join( ["rankeditadd", str(query.from_user.id), "psn", parsed[3]] ) ),
+                types.InlineKeyboardButton( "XBOX", callback_data=separator.join( ["rankeditadd", str(query.from_user.id), "xbox", parsed[3]] ) )
+            )
+            bot.edit_message_text(f"Elige la plataforma de {parsed[3]}:", chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=keyboard)
+        if(parsed[2] == "remove"):
+            url = f"http://mclv.es/fortnite/rankedit/remove/{parsed[3]}"
+            response = urllib.request.urlopen(url).read()
+            delete_message(query.message.chat.id, query.message.message_id)
+            bot.send_message(query.message.chat.id, parsed[3] + response.decode("utf-8"))
+    if(parsed[0] == "rankeditadd" and int(parsed[1]) == query.from_user.id):
+        bot.answer_callback_query(query.id)
+        url = f"http://mclv.es/fortnite/rankedit/add/{parsed[3]}/{parsed[2]}"
+        response = urllib.request.urlopen(url).read()
+        delete_message(query.message.chat.id, query.message.message_id)
+        bot.send_message(query.message.chat.id, parsed[3] + response.decode("utf-8"))
 
-
-
-
-bot.polling()
+bot.polling(none_stop=True, timeout=60)
