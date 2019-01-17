@@ -4,21 +4,10 @@ Bot de Telegram para ver las estadísticas de Fortnite, revisar desafíos semana
 
 ### Comandos
 
-
-### Installing
-
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
-
-```
-/shurstats <usuario>: Muestra las estadísticas generales y de temporada actual de un usuario de plataforma PC, PSN o XB1.
-/ranking: Ranking de shurs ordenado por distintos factores (K/D, Kills, Wins...)
-/islas: Lista de códigos de islas en creativo.
-/semana<1-10>: Envía la imagen hecha por [@squatingdog](https://twitter.com/thesquatingdog) de los desafíos semanales.
-```
-
-End with an example of getting some data out of the system or using it for a little demo
+* **/shurstats <usuario>**: Muestra las estadísticas generales y de temporada actual de un usuario de plataforma PC, PSN o XB1.
+* **/ranking**: Ranking de shurs ordenado por distintos factores (K/D, Kills, Wins...)
+* **/islas**: Lista de códigos de islas en creativo.
+* **/semana<1-10>**: Envía la imagen hecha por [@squatingdog](https://twitter.com/thesquatingdog) de los desafíos semanales.
 
 ## Hecho con
 
