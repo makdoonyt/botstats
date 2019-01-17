@@ -16,6 +16,6 @@ Bot de Telegram para ver las estadísticas de Fortnite, revisar desafíos semana
 
 ## Autores
 
-* **@MakFCB** - *Trabajo inicial*
-* **@dragonalvaro** - *Trabajo inicial*
-* **@Nstemp** - *Mantenimiento y programación*
+* **[@MakFCB](https://t.me/MakFCB)** - *Trabajo inicial*
+* **[@dragonalvaro](https://t.me/dragonalvaro)** - *Trabajo inicial*
+* **[@Nstemp](https://t.me/Nstemp)** - *Mantenimiento y programación*
