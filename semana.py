@@ -1,7 +1,21 @@
-import re, pathlib, tweepy, urllib, datetime, pytesseract
-from PIL import Image
+import re, pathlib, tweepy, urllib, datetime, cv2
+from skimage.measure import compare_ssim
+from skimage import io
 
 from main import bot, tweet, CURRENT_SEASON
+
+def isChallenge(image):
+    test = cv2.resize(cv2.imread("challenges/test.jpg"), (1200, 1200))
+    img = cv2.resize(cv2.cvtColor(image, cv2.COLOR_RGB2BGR), (1200, 1200))
+
+    grayTest = cv2.cvtColor(test, cv2.COLOR_BGR2GRAY)
+    grayImage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    (score, diff) = compare_ssim(grayTest, grayImage, full=True)
+    if score > 0.3:
+        return True
+    else:
+        return False
 
 def semana(message):
     global CURRENT_SEASON
@@ -34,27 +48,18 @@ def semana(message):
             if "CHEAT SHEET" in status.full_text and f"WEEK {week}" in status.full_text and f"SEASON {CURRENT_SEASON}" in status.full_text:
                 if len(status.extended_entities["media"]) > 1:
                     url = status.extended_entities["media"][1]["media_url"]
-                    next = 0
+                    image = io.imread(url)
+                    if not isChallenge(image):
+                        url = status.extended_entities["media"][0]["media_url"]
+                        image = io.imread(url)
                 else:
                     url = status.extended_entities["media"][0]["media_url"]
-                    next = 1
+                    image = io.imread(url)
 
-                response = urllib.request.urlopen(url)
                 bot.send_chat_action(message.chat.id, "upload_photo")
-                f = open(challenge,"wb")
-                f.write(response.read())
+                cv2.imwrite(challenge,cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
+                f = open(challenge,"rb")
+                bot.send_photo(message.chat.id, f)
                 f.close()
-
-                ocr = pytesseract.image_to_string(Image.open(challenge))
-                if len(ocr) < 100:
-                    url = status.extended_entities["media"][next]["media_url"]
-                    response = urllib.request.urlopen(url)
-                f = open(challenge,"wb")
-                f.write(response.read())
-                f.close()
-
-                img = open(challenge, "rb")
-                bot.send_photo(message.chat.id, img)
-                img.close()
                 return
         bot.send_message(message.chat.id,f"La semana {week} aún no está publicada.")
