@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import urllib, time
+import urllib, time, logging
 from telebot import types
 
 from main import bot, separator, delete_message
@@ -7,6 +7,8 @@ from islas import islas
 from semana import semana
 from shurstats import stats, send_stats
 from ranking import rank, rankUpdate, rankEdit, send_rank
+
+logging.basicConfig(filename='logs.log',level=logging.ERROR)
 
 class User:
     def __init__(self, name):
@@ -83,15 +85,18 @@ def iq_callback(query):
             )
             bot.edit_message_text(f"Elige la plataforma de {parsed[3]}:", chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=keyboard)
         if(parsed[2] == "remove"):
-            url = f"http://mclv.es/fortnite/rankedit/remove/{parsed[3]}"
+            epicname = parsed[3].replace(' ','%20')
+            url = f"http://mclv.es/fortnite/rankedit/remove/{epicname}"
             response = urllib.request.urlopen(url).read()
             delete_message(query.message.chat.id, query.message.message_id)
-            bot.send_message(query.message.chat.id, parsed[3] + response.decode("utf-8"))
+            bot.send_message(query.message.chat.id, response.decode("utf-8"))
     if(parsed[0] == "rankeditadd" and int(parsed[1]) == query.from_user.id):
+        #0: rankedit // 1: userid // 2: Plataforma // 3: Usuario Epic
+        epicname = parsed[3].replace(' ','%20')
         bot.answer_callback_query(query.id)
-        url = f"http://mclv.es/fortnite/rankedit/add/{parsed[3]}/{parsed[2]}"
+        url = f"http://mclv.es/fortnite/rankedit/add/{epicname}/{parsed[2]}"
         response = urllib.request.urlopen(url).read()
         delete_message(query.message.chat.id, query.message.message_id)
-        bot.send_message(query.message.chat.id, parsed[3] + response.decode("utf-8"))
+        bot.send_message(query.message.chat.id, response.decode("utf-8"))
 
 bot.polling(none_stop=True, timeout=60)
