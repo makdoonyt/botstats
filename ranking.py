@@ -61,10 +61,5 @@ def send_rank(message, window, category):
         bot.send_message(message.chat.id,"Se ha producido un error al buscar el ranking.")
     else:
         bot.send_chat_action(message.chat.id, "upload_photo")
-        f = open("img/sendrank.jpg","wb")
-        f.write(response.read())
-        f.close()
-        img = open("img/sendrank.jpg", "rb")
         delete_message(message.chat.id, message.message_id)
-        bot.send_photo(message.chat.id, img)
-        img.close()
+        bot.send_photo(message.chat.id, response.read())
