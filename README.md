@@ -16,6 +16,13 @@ Bot de Telegram para ver las estadísticas de Fortnite, revisar desafíos semana
 * [scikit-image 1.2.0](https://scikit-image.org/)
 * [tweepy 3.7.0](http://www.tweepy.org/) - API de Twitter
 
+```
+pip install pyTelegramBotAPI
+pip install opencv-python
+pip install scikit-image
+pip install tweepy
+```
+
 ## Autores
 
 * **[@MakFCB](https://t.me/MakFCB)** - *Trabajo inicial*
