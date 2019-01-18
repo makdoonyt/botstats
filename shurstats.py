@@ -32,7 +32,7 @@ def send_stats(message, plataforma, shur):
     url = f"http://mclv.es/fortnite/{plataforma}/{shur}"
     response = urllib.request.urlopen(url)
     if(response.info().get_content_type() == "text/html"):
-        print("Usuario {shur} no encontrado.")
+        print(f"Usuario {shur} no encontrado.")
         bot.send_message(message.chat.id,f"No encuentro el usuario {shur} en la plataforma {plataforma}. Recuerda que solo funciona con la cuenta de Epic Games.")
     else:
         bot.send_chat_action(message.chat.id, "upload_photo")
