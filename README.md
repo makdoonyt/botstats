@@ -11,7 +11,9 @@ Bot de Telegram para ver las estadísticas de Fortnite, revisar desafíos semana
 
 ## Hecho con
 
-* [pyTelegramBotAPI](https://github.com/eternnoir/pyTelegramBotAPI)
+* [pyTelegramBotAPI 3.6.6](https://github.com/eternnoir/pyTelegramBotAPI)
+* [pytesseract 0.2.6](https://github.com/madmaze/pytesseract)
+* [tweepy 3.7.0](http://www.tweepy.org/)
 * [PHP](http://php.net/) - Generar estadísticas. (No aparece en el repositorio)
 
 ## Autores
