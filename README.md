@@ -25,6 +25,6 @@ pip install tweepy
 
 ## Autores
 
-* **[@MakFCB](https://t.me/MakFCB)** - *Trabajo inicial*
-* **[@dragonalvaro](https://t.me/dragonalvaro)** - *Trabajo inicial*
-* **[@Nstemp](https://t.me/Nstemp)** - *Mantenimiento y programación*
+* **[@MakFCB](https://t.me/MakFCB)**
+* **[@dragonalvaro](https://t.me/dragonalvaro)**
+* **[@Nstemp](https://t.me/Nstemp)**
