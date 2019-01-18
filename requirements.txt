@@ -1,3 +1,4 @@
 pyTelegramBotAPI==3.6.6
-pytesseract==0.2.6
+opencv-python==4.0.0.21
 tweepy==3.7.0
+scikit-image==1.2.0
