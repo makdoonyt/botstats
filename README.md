@@ -11,6 +11,7 @@ Bot de Telegram para ver las estadísticas de Fortnite, revisar desafíos semana
 
 ## Requisitos
 
+* **Python3.7**
 * [pyTelegramBotAPI 3.6.6](https://github.com/eternnoir/pyTelegramBotAPI)
 * [OpenCV-python 4.0.0.21](https://pypi.org/project/opencv-python/)
 * [scikit-image 1.2.0](https://scikit-image.org/)
