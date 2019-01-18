@@ -9,12 +9,12 @@ Bot de Telegram para ver las estadísticas de Fortnite, revisar desafíos semana
 * **/islas**: Lista de códigos de islas en creativo.
 * **/semana<1-10>**: Envía la imagen hecha por [@thesquatingdog](https://twitter.com/thesquatingdog) de los desafíos semanales.
 
-## Hecho con
+## Requisitos
 
 * [pyTelegramBotAPI 3.6.6](https://github.com/eternnoir/pyTelegramBotAPI)
-* [pytesseract 0.2.6](https://github.com/madmaze/pytesseract)
-* [tweepy 3.7.0](http://www.tweepy.org/)
-* [PHP](http://php.net/) - Generar estadísticas. (No aparece en el repositorio)
+* [OpenCV-python 4.0.0.21](https://pypi.org/project/opencv-python/)
+* [scikit-image 1.2.0](https://scikit-image.org/)
+* [tweepy 3.7.0](http://www.tweepy.org/) - API de Twitter
 
 ## Autores
 
