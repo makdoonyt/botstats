@@ -36,10 +36,5 @@ def send_stats(message, plataforma, shur):
         bot.send_message(message.chat.id,f"No encuentro el usuario {shur} en la plataforma {plataforma}. Recuerda que solo funciona con la cuenta de Epic Games.")
     else:
         bot.send_chat_action(message.chat.id, "upload_photo")
-        f = open("img/sendstats.jpg","wb")
-        f.write(response.read())
-        f.close()
-        img = open("img/sendstats.jpg", "rb")
+        bot.send_photo(message.chat.id, response.read())
         print(f"Estadísticas de {shur} enviadas.")
-        bot.send_photo(message.chat.id, img)
-        img.close()
