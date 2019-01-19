@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-import urllib, time, logging, datetime
+import urllib, time, logging
 from telebot import types
+from datetime import datetime, date, time
 
 from main import bot, separator, delete_message
 from islas import islas
@@ -21,7 +22,7 @@ def send_welcome(message):
 
 @bot.message_handler(commands=["evento"])
 def evento(message):
-    now = date.utcnow()
+    now = datetime.utcnow()
     if now.day == 19 and now.hour >= 20 and now.minute > 0:
         bot.send_message(message.chat.id, "El evento era hoy a las 20:00 hora peninsular. Pide perdón por el retraso.")
     if now.day != 19:
