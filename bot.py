@@ -17,7 +17,11 @@ class User:
 
 @bot.message_handler(commands=["start"])
 def send_welcome(message):
-    msg = bot.reply_to(message, "Bienvenido shur! el comando para ver tus estadísticas es \"/shurstats <usuario>\"")
+    bot.reply_to(message, "Bienvenido shur! el comando para ver tus estadísticas es \"/shurstats <usuario>\"")
+
+@bot.message_handler(commands=["evento"])
+def evento(message):
+    bot.send_message(message.chat.id, "El evento será hoy a las 20:00 hora peninsular.")
 
 @bot.message_handler(commands=['creativo','islas'])
 def imported_islas(message):
