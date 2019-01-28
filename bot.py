@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import urllib, time, logging
 from telebot import types
-from datetime import datetime, date, time
+from datetime import datetime, date
+from urllib.parse import quote
 
 from main import bot, separator, delete_message
 from islas import islas
@@ -28,7 +29,7 @@ def evento(message):
     if now.day != 19:
         bot.send_message(message.chat.id, "El evento fue el sábado 19 a las 20:00 hora peninsular. Pide perdón por el retraso.")
     if now.day <= 19 and now.hour < 20:
-        bot.send_message(message.chat.id, "El evento será hoy a las 20:00 hora peninsular.")
+        bot.send_message(message.chat.id, "El evento será hoy a las 20:00 hora peninsular. Los modos Solo, Dúo y Squad serán sustituídos por unos especiales del evento.")
 
 @bot.message_handler(commands=['islas'])
 def imported_islas(message):
@@ -64,7 +65,10 @@ def iq_callback(query):
     if (parsed[0] == "stats" and int(parsed[1]) == query.from_user.id):
         bot.answer_callback_query(query.id)
         bot.delete_message(query.message.chat.id, query.message.message_id)
-        send_stats(query.message, parsed[2], parsed[3])
+        try:
+            send_stats(query.message, parsed[2], parsed[3])
+        except:
+            print("DEP")
     if (parsed[0] == "rank" and int(parsed[1]) == query.from_user.id):
         bot.answer_callback_query(query.id)
         window = parsed[2]
@@ -97,7 +101,7 @@ def iq_callback(query):
             bot.edit_message_text(f"Elige la plataforma de {parsed[3]}:", chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=keyboard)
         if(parsed[2] == "remove"):
             epicname = parsed[3].replace(' ','%20')
-            url = f"http://mclv.es/fortnite/rankedit/remove/{epicname}"
+            url = quote(f"http://mclv.es/fortnite/rankedit/remove/{epicname}",safe=':/?&')
             response = urllib.request.urlopen(url).read()
             delete_message(query.message.chat.id, query.message.message_id)
             bot.send_message(query.message.chat.id, response.decode("utf-8"))
@@ -105,7 +109,7 @@ def iq_callback(query):
         #0: rankedit // 1: userid // 2: Plataforma // 3: Usuario Epic
         epicname = parsed[3].replace(' ','%20')
         bot.answer_callback_query(query.id)
-        url = f"http://mclv.es/fortnite/rankedit/add/{epicname}/{parsed[2]}"
+        url = quote(f"http://mclv.es/fortnite/rankedit/add/{epicname}/{parsed[2]}",safe=':/?&')
         response = urllib.request.urlopen(url).read()
         delete_message(query.message.chat.id, query.message.message_id)
         bot.send_message(query.message.chat.id, response.decode("utf-8"))

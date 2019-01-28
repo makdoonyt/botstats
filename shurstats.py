@@ -1,4 +1,5 @@
 import time, urllib
+from urllib.parse import quote
 from telebot import types
 from main import bot, separator, delete_message
 
@@ -29,8 +30,10 @@ def stats(message):
     delete_message(msg.chat.id, msg.message_id)
 
 def send_stats(message, plataforma, shur):
-    url = f"http://mclv.es/fortnite/{plataforma}/{shur}"
+    url = quote(f"http://mclv.es/fortnite/{plataforma}/{shur}",safe=':/?&')
+    print(url)
     response = urllib.request.urlopen(url)
+    print(response)
     if(response.info().get_content_type() == "text/html"):
         print(f"Usuario {shur} no encontrado.")
         bot.send_message(message.chat.id,f"No encuentro el usuario {shur} en la plataforma {plataforma}. Recuerda que solo funciona con la cuenta de Epic Games.")
