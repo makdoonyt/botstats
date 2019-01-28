@@ -21,7 +21,7 @@ class User:
 def send_welcome(message):
     bot.reply_to(message, "Bienvenido shur! el comando para ver tus estadísticas es \"/shurstats <usuario>\"")
 
-@bot.message_handler(commands=["evento"])
+'''@bot.message_handler(commands=["evento"])
 def evento(message):
     now = datetime.utcnow()
     if now.day == 19 and now.hour >= 20 and now.minute > 0:
@@ -30,7 +30,7 @@ def evento(message):
         bot.send_message(message.chat.id, "El evento fue el sábado 19 a las 20:00 hora peninsular. Pide perdón por el retraso.")
     if now.day <= 19 and now.hour < 20:
         bot.send_message(message.chat.id, "El evento será hoy a las 20:00 hora peninsular. Los modos Solo, Dúo y Squad serán sustituídos por unos especiales del evento.")
-
+'''
 @bot.message_handler(commands=['islas'])
 def imported_islas(message):
     islas(message)

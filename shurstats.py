@@ -30,11 +30,10 @@ def stats(message):
     delete_message(msg.chat.id, msg.message_id)
 
 def send_stats(message, plataforma, shur):
-    url = quote(f"http://mclv.es/fortnite/{plataforma}/{shur}",safe=':/?&')
+    url = quote(f"http://mclv.es/fortnite/{plataforma}/{shur}",safe=':/?&qwertyuiopasdfghjklzxcvbnm')
     print(url)
     response = urllib.request.urlopen(url)
-    print(response)
-    if(response.info().get_content_type() == "text/html"):
+    if response.info().get_content_type() == "text/html":
         print(f"Usuario {shur} no encontrado.")
         bot.send_message(message.chat.id,f"No encuentro el usuario {shur} en la plataforma {plataforma}. Recuerda que solo funciona con la cuenta de Epic Games.")
     else:
