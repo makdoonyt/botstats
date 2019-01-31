@@ -17,6 +17,10 @@ def isChallenge(image):
     else:
         return False
 
+def is_slice_in_list(s,l):
+    len_s = len(s) #so we don't recompute length of s on every iteration
+    return any(s == l[i:len_s+i] for i in xrange(len(l) - len_s+1))
+
 def semana(message):
     global CURRENT_SEASON
     regexp = re.compile("semana([2-9]|10?)")
@@ -40,12 +44,13 @@ def semana(message):
                 bot.send_message(message.chat.id,f"La semana {week} aún no está publicada.")
                 return
             #Definir última semana publicada
-            if "CHEAT SHEET" in status.full_text and latest == 0:
-                latest = int(float(re.compile("WEEK ([2-9]|10?)").findall(status.full_text)[0]))
+            if re.compile('cheat ?sheet', re.IGNORECASE).match(status.full_text) != None and re.compile(f'season {CURRENT_SEASON}', re.IGNORECASE).match(status.full_text) != None and latest == 0:
+                latest = int(float(re.compile("WEEK ([2-9]|10?)", re.IGNORECASE).findall(status.full_text)[0]))
             if latest > 0 and int(float(week)) > latest:
                 bot.send_message(message.chat.id,f"La semana {week} aún no está publicada.")
                 return
-            if "CHEAT SHEET" in status.full_text and f"WEEK {week}" in status.full_text and f"SEASON {CURRENT_SEASON}" in status.full_text:
+
+            if re.compile('cheat ?sheet', re.IGNORECASE).match(status.full_text) != None and re.compile(f'week {week}', re.IGNORECASE).match(status.full_text) != None and f"SEASON {CURRENT_SEASON}" in status.full_text:
                 if len(status.extended_entities["media"]) > 1:
                     url = status.extended_entities["media"][1]["media_url"]
                     image = io.imread(url)
